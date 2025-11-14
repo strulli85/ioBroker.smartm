@@ -11,7 +11,7 @@ const axios = require("axios");
 
 class Smartm extends utils.Adapter {
 	/**
-	 * @param {Partial<utils.AdapterOptions>} [options={}]
+	 * @param {Partial<utils.AdapterOptions>} [options] - some options
 	 */
 	constructor(options) {
 		super({
@@ -33,7 +33,7 @@ class Smartm extends utils.Adapter {
 		if (!this.config.server) {
 			this.setState("info.connection", false, true);
 			this.terminate(
-				"Server is empty - please check instance configuration of " + this.namespace,
+				`Server is empty - please check instance configuration of ${this.namespace}`,
 				utils.EXIT_CODES.INVALID_ADAPTER_CONFIG,
 			);
 			return;
@@ -42,7 +42,7 @@ class Smartm extends utils.Adapter {
 		if (!this.config.username || !this.config.password) {
 			this.setState("info.connection", false, true);
 			this.terminate(
-				"User name and/or user password empty - please check instance configuration of " + this.namespace,
+				`User name and/or user password empty - please check instance configuration of ${this.namespace}`,
 				utils.EXIT_CODES.INVALID_ADAPTER_CONFIG,
 			);
 			return;
@@ -56,7 +56,8 @@ class Smartm extends utils.Adapter {
 
 	/**
 	 * Is called when adapter shuts down - callback has to be called under any circumstances!
-	 * @param {() => void} callback
+	 *
+	 * @param {() => void} callback - callback function
 	 */
 	onUnload(callback) {
 		try {
@@ -65,7 +66,8 @@ class Smartm extends utils.Adapter {
 			this.reloadFlowDataInterval && clearInterval(this.reloadFlowDataInterval);
 			this.reloadStatisticsInterval && clearInterval(this.reloadStatisticsInterval);
 			callback();
-		} catch (e) {
+		} catch (error) {
+			this.log.error(`Error in Unload Function: ${error}`);
 			callback();
 		}
 	}
@@ -74,7 +76,7 @@ class Smartm extends utils.Adapter {
 	 * Login to smart-m server and obtain access token
 	 */
 	async login() {
-		this.log.info("login to smart-m server " + this.config.server);
+		this.log.info(`login to smart-m server ${this.config.server}`);
 
 		//stop previous intervals
 		this.reloadFlowDataInterval && clearInterval(this.reloadFlowDataInterval);
@@ -83,7 +85,7 @@ class Smartm extends utils.Adapter {
 		this.reloadStatisticsInterval && clearInterval(this.reloadStatisticsInterval);
 		this.reloadStatisticsInterval = null;
 		try {
-			const response = await axios.post("https://" + this.config.server + "/backend/slenergy-sys/sys/login", {
+			const response = await axios.post(`https://${this.config.server}/backend/slenergy-sys/sys/login`, {
 				captcha: "",
 				checkKey: "",
 				username: this.config.username,
@@ -110,7 +112,7 @@ class Smartm extends utils.Adapter {
 				}, 1000 * 60);
 			} else {
 				this.setState("info.connection", false, true);
-				this.log.error("Login failed: " + JSON.stringify(response.data, null, 2));
+				this.log.error(`Login failed: ${JSON.stringify(response.data, null, 2)}`);
 				//retry login in 1 minute
 				this.reLoginTimeout = setTimeout(() => {
 					this.login();
@@ -118,7 +120,7 @@ class Smartm extends utils.Adapter {
 			}
 		} catch (error) {
 			this.setState("info.connection", false, true);
-			this.log.error("Error obtaining access token: " + error);
+			this.log.error(`Error obtaining access token: ${error}`);
 			//retry login in 1 minute
 			this.reLoginTimeout = setTimeout(() => {
 				this.login();
@@ -165,7 +167,7 @@ class Smartm extends utils.Adapter {
 		this.powerStationIds = [];
 		for (const powerStation of powerStationList) {
 			this.powerStationIds.push(powerStation.id);
-			this.setObjectNotExists("powerStationList." + powerStation.id, {
+			this.setObjectNotExists(`powerStationList.${powerStation.id}`, {
 				type: "channel",
 				common: {
 					name: powerStation.powerStationName,
@@ -174,7 +176,7 @@ class Smartm extends utils.Adapter {
 			});
 
 			//fill each powerStation subtree with data
-			this.parseData("powerStationList." + powerStation.id, powerStation);
+			this.parseData(`powerStationList.${powerStation.id}`, powerStation);
 		}
 	}
 
@@ -185,11 +187,11 @@ class Smartm extends utils.Adapter {
 		this.log.debug("Reloading flow data from smart-m server");
 
 		for (const powerStationId of this.powerStationIds) {
-			this.log.debug("Reloading flow data of plant " + powerStationId);
+			this.log.debug(`Reloading flow data of plant ${powerStationId}`);
 			try {
 				const currentDate = new Date();
 				const response = await axios.post(
-					"https://" + this.config.server + "/backend/slenergy-ops/ops/energy/storage/home/flow",
+					`https://${this.config.server}/backend/slenergy-ops/ops/energy/storage/home/flow`,
 					{
 						powerStationId: powerStationId,
 						year: currentDate.getFullYear(),
@@ -203,19 +205,19 @@ class Smartm extends utils.Adapter {
 					},
 				);
 				if (response.data.success) {
-					this.log.debug("flow data request successful" + JSON.stringify(response.data, null, 2));
+					this.log.debug(`flow data request successful${JSON.stringify(response.data, null, 2)}`);
 
-					this.setObjectNotExists("powerStationList." + powerStationId + ".flow", {
+					this.setObjectNotExists(`powerStationList.${powerStationId}.flow`, {
 						type: "channel",
 						common: {
-							name: "powerStationList." + powerStationId + ".flow",
+							name: `powerStationList.${powerStationId}.flow`,
 						},
 						native: {},
 					});
 
-					this.parseData("powerStationList." + powerStationId + ".flow", response.data.result);
+					this.parseData(`powerStationList.${powerStationId}.flow`, response.data.result);
 				} else {
-					this.log.error("reading flow data failed: " + JSON.stringify(response.data, null, 2));
+					this.log.error(`reading flow data failed: ${JSON.stringify(response.data, null, 2)}`);
 					//retry login in 1 minute
 					this.reLoginTimeout = setTimeout(() => {
 						this.login();
@@ -223,7 +225,7 @@ class Smartm extends utils.Adapter {
 					return;
 				}
 			} catch (error) {
-				this.log.error("reading flow data failed: " + error);
+				this.log.error(`reading flow data failed: ${error}`);
 				//retry login in 1 minute
 				this.reLoginTimeout = setTimeout(() => {
 					this.login();
@@ -240,13 +242,12 @@ class Smartm extends utils.Adapter {
 		this.log.debug("Reloading statistics from smart-m server");
 
 		for (const powerStationId of this.powerStationIds) {
-			this.log.debug("Reloading statistic of plant " + powerStationId);
+			this.log.debug(`Reloading statistic of plant ${powerStationId}`);
 			try {
 				const response = await axios.get(
-					"https://" +
-						this.config.server +
-						"/backend/slenergy-ops/ops/energy/storage/overview-statistics/" +
-						powerStationId,
+					`https://${this.config.server}/backend/slenergy-ops/ops/energy/storage/overview-statistics/${
+						powerStationId
+					}`,
 					{
 						headers: {
 							"X-Access-Token": this.accessToken,
@@ -254,19 +255,19 @@ class Smartm extends utils.Adapter {
 					},
 				);
 				if (response.data.success) {
-					this.log.debug("statistic data request successful" + JSON.stringify(response.data, null, 2));
+					this.log.debug(`statistic data request successful${JSON.stringify(response.data, null, 2)}`);
 
-					this.setObjectNotExists("powerStationList." + powerStationId + ".statistics", {
+					this.setObjectNotExists(`powerStationList.${powerStationId}.statistics`, {
 						type: "channel",
 						common: {
-							name: "powerStationList." + powerStationId + ".statistics",
+							name: `powerStationList.${powerStationId}.statistics`,
 						},
 						native: {},
 					});
 
-					this.parseData("powerStationList." + powerStationId + ".statistics", response.data.result);
+					this.parseData(`powerStationList.${powerStationId}.statistics`, response.data.result);
 				} else {
-					this.log.error("reading statistics failed: " + JSON.stringify(response.data, null, 2));
+					this.log.error(`reading statistics failed: ${JSON.stringify(response.data, null, 2)}`);
 					//retry login in 1 minute
 					this.reLoginTimeout = setTimeout(() => {
 						this.login();
@@ -274,7 +275,7 @@ class Smartm extends utils.Adapter {
 					return;
 				}
 			} catch (error) {
-				this.log.error("reading statistics data failed: " + error);
+				this.log.error(`reading statistics data failed: ${error}`);
 				//retry login in 1 minute
 				this.reLoginTimeout = setTimeout(() => {
 					this.login();
@@ -288,7 +289,7 @@ class Smartm extends utils.Adapter {
 		const objectKeys = Object.keys(jsonObject);
 		for (const key of objectKeys) {
 			const jsType = typeof jsonObject[key];
-			const iobId = parentIoBrokerId + "." + key;
+			const iobId = `${parentIoBrokerId}.${key}`;
 
 			if (jsType === "object") {
 				if (jsonObject[key] !== null) {
@@ -339,9 +340,9 @@ class Smartm extends utils.Adapter {
 if (require.main !== module) {
 	// Export the constructor in compact mode
 	/**
-	 * @param {Partial<utils.AdapterOptions>} [options={}]
+	 * @param {Partial<utils.AdapterOptions>} [options] - some options
 	 */
-	module.exports = (options) => new Smartm(options);
+	module.exports = options => new Smartm(options);
 } else {
 	// otherwise start the instance directly
 	new Smartm();
