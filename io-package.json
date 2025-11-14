@@ -1,109 +1,132 @@
 {
-	"common": {
-		"name": "smartm",
-		"version": "0.0.1",
-		"news": {
-			"0.0.1": {
-				"en": "initial release",
-				"de": "Erstveröffentlichung",
-				"ru": "Начальная версия",
-				"pt": "lançamento inicial",
-				"nl": "Eerste uitgave",
-				"fr": "Première version",
-				"it": "Versione iniziale",
-				"es": "Versión inicial",
-				"pl": "Pierwsze wydanie",
-				"uk": "Початкова версія",
-				"zh-cn": "首次出版"
-			}
-		},
-		"titleLang": {
-			"en": "Slenergy - SmartM",
-			"de": "Slenergy - SmartM",
-			"ru": "Сленергия - СмартМ",
-			"pt": "Slenergy - SmartM",
-			"nl": "Slenergie - SmartM",
-			"fr": "Slenergy - SmartM",
-			"it": "Slenergy - SmartM",
-			"es": "Slenergia - SmartM",
-			"pl": "Sleenergy - SmartM",
-			"uk": "Slenergy - SmartM",
-			"zh-cn": "Slenergy-SmartM"
-		},
-		"desc": {
-			"en": "reads Data of Slenergy-Photovoltaic-Plants over SmartM",
-			"de": "liest Daten von Slenergy-Photovoltaik-Anlagen über SmartM",
-			"ru": "читает данные фотоэлектрических станций Slenergy через SmartM",
-			"pt": "lê dados de plantas fotovoltaicas Slenergy sobre SmartM",
-			"nl": "leest gegevens van Slenergy-fotovoltaïsche installaties via SmartM",
-			"fr": "lit les données des installations photovoltaïques Slenergy via SmartM",
-			"it": "legge i dati degli impianti fotovoltaici Slenergy su SmartM",
-			"es": "lee los datos de las plantas fotovoltaicas de Slenergy sobre SmartM",
-			"pl": "czyta Dane Slenergy-Fotowoltaiki-Plants na SmartM",
-			"uk": "читає дані Slenergy-Photovoltaic-Plants через SmartM",
-			"zh-cn": "通过 SmartM 读取 Slenergy 光伏电站的数据"
-		},
-		"authors": ["Christian Müller"],
-		"keywords": ["Photovoltaic", "Slenergy", "SmartM"],
-		"licenseInformation": {
-			"type": "free",
-			"license": "MIT"
-		},
-		"platform": "Javascript/Node.js",
-		"icon": "smartm.svg",
-		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/strulli85/ioBroker.smartm/main/admin/smartm.svg",
-		"readme": "https://github.com/strulli85/ioBroker.smartm/blob/main/README.md",
-		"loglevel": "info",
-		"tier": 3,
-		"mode": "daemon",
-		"type": "energy",
-		"compact": true,
-		"connectionType": "cloud",
-		"dataSource": "poll",
-		"adminUI": {
-			"config": "json"
-		},
-		"dependencies": [
-			{
-				"js-controller": ">=6.0.11"
-			}
-		],
-		"globalDependencies": [
-			{
-				"admin": ">=7.7.19"
-			}
-		]
-	},
-	"native": {
-		"server": "eu.slenergytech.com",
-		"username": "",
-		"password": ""
-	},
-	"encryptedNative": ["password"],
-	"protectedNative": ["password"],
-	"objects": [],
-	"instanceObjects": [
-		{
-			"_id": "info",
-			"type": "channel",
-			"common": {
-				"name": "Information"
-			},
-			"native": {}
-		},
-		{
-			"_id": "info.connection",
-			"type": "state",
-			"common": {
-				"role": "indicator.connected",
-				"name": "Device or service connected",
-				"type": "boolean",
-				"read": true,
-				"write": false,
-				"def": false
-			},
-			"native": {}
-		}
-	]
+  "common": {
+    "name": "smartm",
+    "version": "0.0.2",
+    "news": {
+      "0.0.2": {
+        "en": "initial release",
+        "de": "erstausstrahlung",
+        "ru": "первоначальное освобождение",
+        "pt": "libertação inicial",
+        "nl": "eerste release",
+        "fr": "libération initiale",
+        "it": "rilascio iniziale",
+        "es": "liberación inicial",
+        "pl": "początkowe zwolnienie",
+        "uk": "початковий реліз",
+        "zh-cn": "初步释放"
+      },
+      "0.0.1": {
+        "en": "initial release",
+        "de": "Erstveröffentlichung",
+        "ru": "Начальная версия",
+        "pt": "lançamento inicial",
+        "nl": "Eerste uitgave",
+        "fr": "Première version",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "uk": "Початкова версія",
+        "zh-cn": "首次出版"
+      }
+    },
+    "titleLang": {
+      "en": "Slenergy - SmartM",
+      "de": "Slenergy - SmartM",
+      "ru": "Сленергия - СмартМ",
+      "pt": "Slenergy - SmartM",
+      "nl": "Slenergie - SmartM",
+      "fr": "Slenergy - SmartM",
+      "it": "Slenergy - SmartM",
+      "es": "Slenergia - SmartM",
+      "pl": "Sleenergy - SmartM",
+      "uk": "Slenergy - SmartM",
+      "zh-cn": "Slenergy-SmartM"
+    },
+    "desc": {
+      "en": "reads Data of Slenergy-Photovoltaic-Plants over SmartM",
+      "de": "liest Daten von Slenergy-Photovoltaik-Anlagen über SmartM",
+      "ru": "читает данные фотоэлектрических станций Slenergy через SmartM",
+      "pt": "lê dados de plantas fotovoltaicas Slenergy sobre SmartM",
+      "nl": "leest gegevens van Slenergy-fotovoltaïsche installaties via SmartM",
+      "fr": "lit les données des installations photovoltaïques Slenergy via SmartM",
+      "it": "legge i dati degli impianti fotovoltaici Slenergy su SmartM",
+      "es": "lee los datos de las plantas fotovoltaicas de Slenergy sobre SmartM",
+      "pl": "czyta Dane Slenergy-Fotowoltaiki-Plants na SmartM",
+      "uk": "читає дані Slenergy-Photovoltaic-Plants через SmartM",
+      "zh-cn": "通过 SmartM 读取 Slenergy 光伏电站的数据"
+    },
+    "authors": [
+      "Christian Müller"
+    ],
+    "keywords": [
+      "Photovoltaic",
+      "Slenergy",
+      "SmartM"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "icon": "smartm.svg",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/strulli85/ioBroker.smartm/main/admin/smartm.svg",
+    "readme": "https://github.com/strulli85/ioBroker.smartm/blob/main/README.md",
+    "loglevel": "info",
+    "tier": 3,
+    "mode": "daemon",
+    "type": "energy",
+    "compact": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.7.19"
+      }
+    ]
+  },
+  "native": {
+    "server": "eu.slenergytech.com",
+    "username": "",
+    "password": ""
+  },
+  "encryptedNative": [
+    "password"
+  ],
+  "protectedNative": [
+    "password"
+  ],
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
