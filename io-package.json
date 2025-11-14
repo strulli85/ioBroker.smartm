@@ -1,0 +1,106 @@
+{
+	"common": {
+		"name": "smartm",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Начальная версия",
+				"pt": "lançamento inicial",
+				"nl": "Eerste uitgave",
+				"fr": "Première version",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"uk": "Початкова версія",
+				"zh-cn": "首次出版"
+			}
+		},
+		"titleLang": {
+			"en": "Slenergy - SmartM",
+			"de": "Slenergy - SmartM",
+			"ru": "Сленергия - СмартМ",
+			"pt": "Slenergy - SmartM",
+			"nl": "Slenergie - SmartM",
+			"fr": "Slenergy - SmartM",
+			"it": "Slenergy - SmartM",
+			"es": "Slenergia - SmartM",
+			"pl": "Sleenergy - SmartM",
+			"uk": "Slenergy - SmartM",
+			"zh-cn": "Slenergy-SmartM"
+		},
+		"desc": {
+			"en": "This Adapter reads Data of Slenergy-Photovoltaic-Plants over SmartM",
+			"de": "Dieser Adapter liest Daten von Slenergy-Photovoltaik-Anlagen über SmartM",
+			"ru": "Этот адаптер считывает данные фотоэлектрических установок Slenergy через SmartM.",
+			"pt": "Este adaptador lê dados de plantas fotovoltaicas Slenergy através do SmartM",
+			"nl": "Deze adapter leest gegevens van Slenergy-fotovoltaïsche installaties via SmartM",
+			"fr": "Cet adaptateur lit les données des centrales photovoltaïques Slenergy via SmartM",
+			"it": "Questo adattatore legge i dati degli impianti fotovoltaici Slenergy su SmartM",
+			"es": "Este adaptador lee datos de plantas fotovoltaicas de Slenergy a través de SmartM",
+			"pl": "Ten adapter odczytuje dane z instalacji fotowoltaicznych Slenergy poprzez SmartM",
+			"uk": "Цей адаптер зчитує дані фотоелектричних установок Slenergy через SmartM",
+			"zh-cn": "该适配器通过 SmartM 读取 Slenergy 光伏电站的数据"
+		},
+		"authors": ["Christian Müller <non@email.de>"],
+		"keywords": ["\"Photovoltaic\"", "\"Slenergy\"", "\"SmartM\""],
+		"licenseInformation": {
+			"type": "free",
+			"license": "MIT"
+		},
+		"platform": "Javascript/Node.js",
+		"icon": "smartm.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/strulli85/ioBroker.smartm/main/admin/smartm.png",
+		"readme": "https://github.com/strulli85/ioBroker.smartm/blob/main/README.md",
+		"loglevel": "info",
+		"tier": 3,
+		"mode": "daemon",
+		"type": "energy",
+		"compact": true,
+		"connectionType": "cloud",
+		"dataSource": "poll",
+		"adminUI": {
+			"config": "json"
+		},
+		"dependencies": [
+			{
+				"js-controller": ">=6.0.11"
+			}
+		],
+		"globalDependencies": [
+			{
+				"admin": ">=7.0.23"
+			}
+		]
+	},
+	"native": {
+		"option1": true,
+		"option2": "42"
+	},
+	"objects": [],
+	"instanceObjects": [
+		{
+			"_id": "info",
+			"type": "channel",
+			"common": {
+				"name": "Information"
+			},
+			"native": {}
+		},
+		{
+			"_id": "info.connection",
+			"type": "state",
+			"common": {
+				"role": "indicator.connected",
+				"name": "Device or service connected",
+				"type": "boolean",
+				"read": true,
+				"write": false,
+				"def": false
+			},
+			"native": {}
+		}
+	]
+}
