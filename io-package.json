@@ -50,9 +50,9 @@
 			"license": "MIT"
 		},
 		"platform": "Javascript/Node.js",
-		"icon": "smartm.png",
+		"icon": "smartm.svg",
 		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/strulli85/ioBroker.smartm/main/admin/smartm.png",
+		"extIcon": "https://raw.githubusercontent.com/strulli85/ioBroker.smartm/main/admin/smartm.svg",
 		"readme": "https://github.com/strulli85/ioBroker.smartm/blob/main/README.md",
 		"loglevel": "info",
 		"tier": 3,
