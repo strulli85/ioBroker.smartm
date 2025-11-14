@@ -43,16 +43,8 @@
 			"uk": "читає дані Slenergy-Photovoltaic-Plants через SmartM",
 			"zh-cn": "通过 SmartM 读取 Slenergy 光伏电站的数据"
 		},
-		"authors": [
-			"Christian Müller"
-		],
-		"keywords": [
-			"ioBroker",
-			"ioBroker-Adapter",
-			"Photovoltaic",
-			"Slenergy",
-			"SmartM"
-		],
+		"authors": ["Christian Müller"],
+		"keywords": ["Photovoltaic", "Slenergy", "SmartM"],
 		"licenseInformation": {
 			"type": "free",
 			"license": "MIT"
@@ -88,6 +80,8 @@
 		"username": "",
 		"password": ""
 	},
+	"encryptedNative": ["password"],
+	"protectedNative": ["password"],
 	"objects": [],
 	"instanceObjects": [
 		{

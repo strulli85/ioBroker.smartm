@@ -9,6 +9,8 @@
   "homepage": "https://github.com/strulli85/ioBroker.smartm",
   "license": "MIT",
   "keywords": [
+    "ioBroker",
+    "ioBroker-Adapter",
     "Photovoltaic",
     "Slenergy",
     "SmartM"
