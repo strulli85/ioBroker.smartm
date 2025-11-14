@@ -2,25 +2,30 @@
 	"i18n": true,
 	"type": "panel",
 	"items": {
-		"option1": {
-			"type": "checkbox",
-			"label": "option1",
-			"newLine": true,
-			"xs": 12,
-			"sm": 12,
-			"md": 6,
-			"lg": 4,
-			"xl": 4
+		"server": {
+			"type": "select",
+			"label": "Server",
+			"options": [
+				{ "value": "slenergytech.com", "label": "China" },
+				{ "value": "global.slenergytech.com", "label": "International" },
+				{ "value": "eu.slenergytech.com", "label": "Europa" }
+			],
+			"default": "eu.slenergytech.com"
 		},
-		"option2": {
+		"username": {
 			"type": "text",
-			"label": "option2",
+			"label": "Benutzername",
 			"newLine": true,
-			"xs": 12,
 			"sm": 12,
 			"md": 6,
-			"lg": 4,
-			"xl": 4
+			"lg": 6
+		},
+		"password": {
+			"type": "password",
+			"label": "Passwort",
+			"sm": 12,
+			"md": 6,
+			"lg": 6
 		}
 	}
 }

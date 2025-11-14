@@ -1,29 +1,28 @@
 "use strict";
 
 /*
- * Created with @iobroker/create-adapter v3.1.2
+ * Created with @iobroker/create-adapter v2.6.5
  */
 
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require("@iobroker/adapter-core");
-
-// Load your modules here, e.g.:
-// const fs = require("fs");
+const axios = require("axios");
 
 class Smartm extends utils.Adapter {
 	/**
-	 * @param {Partial<utils.AdapterOptions>} [options] - Adapter options
+	 * @param {Partial<utils.AdapterOptions>} [options={}]
 	 */
 	constructor(options) {
 		super({
 			...options,
 			name: "smartm",
 		});
+
+		this.accessToken = null;
+		this.powerStationIds = [];
+
 		this.on("ready", this.onReady.bind(this));
-		this.on("stateChange", this.onStateChange.bind(this));
-		// this.on("objectChange", this.onObjectChange.bind(this));
-		// this.on("message", this.onMessage.bind(this));
 		this.on("unload", this.onUnload.bind(this));
 	}
 
@@ -31,149 +30,316 @@ class Smartm extends utils.Adapter {
 	 * Is called when databases are connected and adapter received configuration.
 	 */
 	async onReady() {
-		// Initialize your adapter here
+		if (!this.config.server) {
+			this.setState("info.connection", false, true);
+			this.terminate(
+				"Server is empty - please check instance configuration of " + this.namespace,
+				utils.EXIT_CODES.INVALID_ADAPTER_CONFIG,
+			);
+			return;
+		}
 
-		// Reset the connection indicator during startup
-		this.setState("info.connection", false, true);
+		if (!this.config.username || !this.config.password) {
+			this.setState("info.connection", false, true);
+			this.terminate(
+				"User name and/or user password empty - please check instance configuration of " + this.namespace,
+				utils.EXIT_CODES.INVALID_ADAPTER_CONFIG,
+			);
+			return;
+		}
 
-		// The adapters config (in the instance object everything under the attribute "native") is accessible via
-		// this.config:
-		this.log.debug("config option1: ${this.config.option1}");
-		this.log.debug("config option2: ${this.config.option2}");
-
-		/*
-		For every state in the system there has to be also an object of type state
-		Here a simple template for a boolean variable named "testVariable"
-		Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
-
-		IMPORTANT: State roles should be chosen carefully based on the state's purpose.
-		           Please refer to the state roles documentation for guidance:
-		           https://www.iobroker.net/#en/documentation/dev/stateroles.md
-		*/
-		await this.setObjectNotExistsAsync("testVariable", {
-			type: "state",
-			common: {
-				name: "testVariable",
-				type: "boolean",
-				role: "indicator",
-				read: true,
-				write: true,
-			},
-			native: {},
-		});
-
-		// In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
-		this.subscribeStates("testVariable");
-		// You can also add a subscription for multiple states. The following line watches all states starting with "lights."
-		// this.subscribeStates("lights.*");
-		// Or, if you really must, you can also watch all states. Don't do this if you don't need to. Otherwise this will cause a lot of unnecessary load on the system:
-		// this.subscribeStates("*");
-
-		/*
-			setState examples
-			you will notice that each setState will cause the stateChange event to fire (because of above subscribeStates cmd)
-		*/
-		// the variable testVariable is set to true as command (ack=false)
-		await this.setState("testVariable", true);
-
-		// same thing, but the value is flagged "ack"
-		// ack should be always set to true if the value is received from or acknowledged from the target system
-		await this.setState("testVariable", { val: true, ack: true });
-
-		// same thing, but the state is deleted after 30s (getState will return null afterwards)
-		await this.setState("testVariable", { val: true, ack: true, expire: 30 });
-
-		// examples for the checkPassword/checkGroup functions
-		const pwdResult = await this.checkPasswordAsync("admin", "iobroker");
-		this.log.info(`check user admin pw iobroker: ${pwdResult}`);
-
-		const groupResult = await this.checkGroupAsync("admin", "admin");
-		this.log.info(`check group user admin group admin: ${groupResult}`);
+		this.reLoginTimeout = null;
+		this.reloadFlowDataInterval = null;
+		this.reloadStatisticsInterval = null;
+		this.login();
 	}
 
 	/**
 	 * Is called when adapter shuts down - callback has to be called under any circumstances!
-	 *
-	 * @param {() => void} callback - Callback function
+	 * @param {() => void} callback
 	 */
 	onUnload(callback) {
 		try {
-			// Here you must clear all timeouts or intervals that may still be active
-			// clearTimeout(timeout1);
-			// clearTimeout(timeout2);
-			// ...
-			// clearInterval(interval1);
-
+			this.setState("info.connection", false, true);
+			this.reLoginTimeout && clearTimeout(this.reLoginTimeout);
+			this.reloadFlowDataInterval && clearInterval(this.reloadFlowDataInterval);
+			this.reloadStatisticsInterval && clearInterval(this.reloadStatisticsInterval);
 			callback();
-		} catch (error) {
-			this.log.error(`Error during unloading: ${error.message}`);
+		} catch (e) {
 			callback();
 		}
 	}
 
-	// If you need to react to object changes, uncomment the following block and the corresponding line in the constructor.
-	// You also need to subscribe to the objects with `this.subscribeObjects`, similar to `this.subscribeStates`.
-	// /**
-	//  * Is called if a subscribed object changes
-	//  * @param {string} id
-	//  * @param {ioBroker.Object | null | undefined} obj
-	//  */
-	// onObjectChange(id, obj) {
-	// 	if (obj) {
-	// 		// The object was changed
-	// 		this.log.info(`object ${id} changed: ${JSON.stringify(obj)}`);
-	// 	} else {
-	// 		// The object was deleted
-	// 		this.log.info(`object ${id} deleted`);
-	// 	}
-	// }
-
-	/**
-	 * Is called if a subscribed state changes
-	 *
-	 * @param {string} id - State ID
-	 * @param {ioBroker.State | null | undefined} state - State object
+	/*
+	 * Login to smart-m server and obtain access token
 	 */
-	onStateChange(id, state) {
-		if (state) {
-			// The state was changed
-			this.log.info(`state ${id} changed: ${state.val} (ack = ${state.ack})`);
+	async login() {
+		this.log.info("login to smart-m server " + this.config.server);
 
-			if (state.ack === false) {
-				// This is a command from the user (e.g., from the UI or other adapter)
-				// and should be processed by the adapter
-				this.log.info(`User command received for ${id}: ${state.val}`);
+		//stop previous intervals
+		this.reloadFlowDataInterval && clearInterval(this.reloadFlowDataInterval);
+		this.reloadFlowDataInterval = null;
 
-				// TODO: Add your control logic here
+		this.reloadStatisticsInterval && clearInterval(this.reloadStatisticsInterval);
+		this.reloadStatisticsInterval = null;
+		try {
+			const response = await axios.post("https://" + this.config.server + "/backend/slenergy-sys/sys/login", {
+				captcha: "",
+				checkKey: "",
+				username: this.config.username,
+				password: this.config.password,
+				remember_me: true,
+			});
+			if (response.data.success) {
+				this.log.info("Login successful");
+				this.setState("info.connection", true, true);
+				this.accessToken = response.data.result.token;
+				this.parseUserInfo(response.data.result.userInfo);
+				this.parsePowerStationList(response.data.result.powerStationList);
+
+				//start reloading flow data every minute
+				this.reloadFlowData();
+				this.reloadFlowDataInterval = setInterval(() => {
+					this.reloadFlowData();
+				}, 1000 * 60);
+
+				//start reloading statistics every minute
+				this.reloadStatistics();
+				this.reloadStatisticsInterval = setInterval(() => {
+					this.reloadStatistics();
+				}, 1000 * 60);
+			} else {
+				this.setState("info.connection", false, true);
+				this.log.error("Login failed: " + JSON.stringify(response.data, null, 2));
+				//retry login in 1 minute
+				this.reLoginTimeout = setTimeout(() => {
+					this.login();
+				}, 1000 * 60);
 			}
-		} else {
-			// The object was deleted or the state value has expired
-			this.log.info(`state ${id} deleted`);
+		} catch (error) {
+			this.setState("info.connection", false, true);
+			this.log.error("Error obtaining access token: " + error);
+			//retry login in 1 minute
+			this.reLoginTimeout = setTimeout(() => {
+				this.login();
+			}, 1000 * 60);
 		}
 	}
-	// If you need to accept messages in your adapter, uncomment the following block and the corresponding line in the constructor.
-	// /**
-	//  * Some message was sent to this instance over message box. Used by email, pushover, text2speech, ...
-	//  * Using this method requires "common.messagebox" property to be set to true in io-package.json
-	//  * @param {ioBroker.Message} obj
-	//  */
-	// onMessage(obj) {
-	// 	if (typeof obj === "object" && obj.message) {
-	// 		if (obj.command === "send") {
-	// 			// e.g. send email or pushover or whatever
-	// 			this.log.info("send command");
 
-	// 			// Send response in callback if required
-	// 			if (obj.callback) this.sendTo(obj.from, obj.command, "Message received", obj.callback);
-	// 		}
-	// 	}
-	// }
+	/*
+	 * parse UserInfo from login response
+	 * @param {object} userInfo - user info object from login response
+	 */
+	parseUserInfo(userInfo) {
+		this.log.debug("Parsing user info");
+
+		//create subtree for userInfo
+		this.setObjectNotExists("userInfo", {
+			type: "channel",
+			common: {
+				name: "Benutzerinformationen",
+			},
+			native: {},
+		});
+
+		this.parseData("userInfo", userInfo);
+	}
+
+	/*
+	 * parse PowerStationList from login response
+	 * @param {array} powerStationList - array of power station objects from login response
+	 */
+	parsePowerStationList(powerStationList) {
+		this.log.debug("Parsing power station list");
+
+		//create subtree for powerStationList
+		this.setObjectNotExists("powerStationList", {
+			type: "channel",
+			common: {
+				name: "Anlageninformationen",
+			},
+			native: {},
+		});
+
+		//create a subtree for each powerStation
+		this.powerStationIds = [];
+		for (const powerStation of powerStationList) {
+			this.powerStationIds.push(powerStation.id);
+			this.setObjectNotExists("powerStationList." + powerStation.id, {
+				type: "channel",
+				common: {
+					name: powerStation.powerStationName,
+				},
+				native: {},
+			});
+
+			//fill each powerStation subtree with data
+			this.parseData("powerStationList." + powerStation.id, powerStation);
+		}
+	}
+
+	/*
+	 * Reload flow data for all power stations
+	 */
+	async reloadFlowData() {
+		this.log.debug("Reloading flow data from smart-m server");
+
+		for (const powerStationId of this.powerStationIds) {
+			this.log.debug("Reloading flow data of plant " + powerStationId);
+			try {
+				const currentDate = new Date();
+				const response = await axios.post(
+					"https://" + this.config.server + "/backend/slenergy-ops/ops/energy/storage/home/flow",
+					{
+						powerStationId: powerStationId,
+						year: currentDate.getFullYear(),
+						month: currentDate.getMonth() + 1, //month is zero based
+						day: currentDate.getDate(),
+					},
+					{
+						headers: {
+							"X-Access-Token": this.accessToken,
+						},
+					},
+				);
+				if (response.data.success) {
+					this.log.debug("flow data request successful" + JSON.stringify(response.data, null, 2));
+
+					this.setObjectNotExists("powerStationList." + powerStationId + ".flow", {
+						type: "channel",
+						common: {
+							name: "powerStationList." + powerStationId + ".flow",
+						},
+						native: {},
+					});
+
+					this.parseData("powerStationList." + powerStationId + ".flow", response.data.result);
+				} else {
+					this.log.error("reading flow data failed: " + JSON.stringify(response.data, null, 2));
+					//retry login in 1 minute
+					this.reLoginTimeout = setTimeout(() => {
+						this.login();
+					}, 1000 * 60);
+					return;
+				}
+			} catch (error) {
+				this.log.error("reading flow data failed: " + error);
+				//retry login in 1 minute
+				this.reLoginTimeout = setTimeout(() => {
+					this.login();
+				}, 1000 * 60);
+				return;
+			}
+		}
+	}
+
+	/*
+	 * Reload statistics
+	 */
+	async reloadStatistics() {
+		this.log.debug("Reloading statistics from smart-m server");
+
+		for (const powerStationId of this.powerStationIds) {
+			this.log.debug("Reloading statistic of plant " + powerStationId);
+			try {
+				const response = await axios.get(
+					"https://" +
+						this.config.server +
+						"/backend/slenergy-ops/ops/energy/storage/overview-statistics/" +
+						powerStationId,
+					{
+						headers: {
+							"X-Access-Token": this.accessToken,
+						},
+					},
+				);
+				if (response.data.success) {
+					this.log.debug("statistic data request successful" + JSON.stringify(response.data, null, 2));
+
+					this.setObjectNotExists("powerStationList." + powerStationId + ".statistics", {
+						type: "channel",
+						common: {
+							name: "powerStationList." + powerStationId + ".statistics",
+						},
+						native: {},
+					});
+
+					this.parseData("powerStationList." + powerStationId + ".statistics", response.data.result);
+				} else {
+					this.log.error("reading statistics failed: " + JSON.stringify(response.data, null, 2));
+					//retry login in 1 minute
+					this.reLoginTimeout = setTimeout(() => {
+						this.login();
+					}, 1000 * 60);
+					return;
+				}
+			} catch (error) {
+				this.log.error("reading statistics data failed: " + error);
+				//retry login in 1 minute
+				this.reLoginTimeout = setTimeout(() => {
+					this.login();
+				}, 1000 * 60);
+				return;
+			}
+		}
+	}
+
+	parseData(parentIoBrokerId, jsonObject) {
+		const objectKeys = Object.keys(jsonObject);
+		for (const key of objectKeys) {
+			const jsType = typeof jsonObject[key];
+			const iobId = parentIoBrokerId + "." + key;
+
+			if (jsType === "object") {
+				if (jsonObject[key] !== null) {
+					this.setObjectNotExists(iobId, {
+						type: "channel",
+						common: {
+							name: iobId,
+						},
+						native: {},
+					});
+					this.parseData(iobId, jsonObject[key]);
+				}
+			} else {
+				//create state
+				let iobType;
+				switch (jsType) {
+					case "number":
+						iobType = "number";
+						break;
+					case "string":
+						iobType = "string";
+						break;
+					case "boolean":
+						iobType = "boolean";
+						break;
+					default:
+						iobType = "string";
+				}
+
+				this.setObjectNotExists(iobId, {
+					type: "state",
+					common: {
+						name: iobId,
+						type: iobType,
+						role: "state",
+						read: true,
+						write: false,
+					},
+					native: {},
+				});
+
+				this.setStateChanged(iobId, jsonObject[key], true);
+			}
+		}
+	}
 }
 
 if (require.main !== module) {
 	// Export the constructor in compact mode
 	/**
-	 * @param {Partial<utils.AdapterOptions>} [options] - Adapter options
+	 * @param {Partial<utils.AdapterOptions>} [options={}]
 	 */
 	module.exports = (options) => new Smartm(options);
 } else {
