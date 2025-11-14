@@ -1,5 +1,8 @@
 {
-	"smartm adapter settings": "Ajustes del adaptador para smartm",
-	"option1": "opción1",
-	"option2": "opción2"
+	"Benutzername": "Nombre de usuario",
+	"China": "Porcelana",
+	"Europa": "Europa",
+	"International": "Internacional",
+	"Passwort": "Contraseña",
+	"Server": "Servidor"
 }
