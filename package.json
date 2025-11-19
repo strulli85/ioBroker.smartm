@@ -1,6 +1,6 @@
 {
   "name": "iobroker.smartm",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "This Adapter reads Data of Slenergy-Photovoltaic-Plants over SmartM",
   "author": {
     "name": "Christian Müller",
