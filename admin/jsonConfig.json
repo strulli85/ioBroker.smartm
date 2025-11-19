@@ -10,22 +10,31 @@
 				{ "value": "global.slenergytech.com", "label": "International" },
 				{ "value": "eu.slenergytech.com", "label": "Europa" }
 			],
-			"default": "eu.slenergytech.com"
+			"default": "eu.slenergytech.com",
+			"xs": 12,
+			"sm": 12,
+			"md": 12,
+			"lg": 12,
+			"xl": 12
 		},
 		"username": {
 			"type": "text",
 			"label": "Benutzername",
 			"newLine": true,
+			"xs": 12,
 			"sm": 12,
 			"md": 6,
-			"lg": 6
+			"lg": 6,
+			"xl": 6
 		},
 		"password": {
 			"type": "password",
 			"label": "Passwort",
+			"xs": 12,
 			"sm": 12,
 			"md": 6,
-			"lg": 6
+			"lg": 6,
+			"xl": 6
 		}
 	}
 }
