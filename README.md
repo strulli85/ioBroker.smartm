@@ -13,7 +13,7 @@
 
 ## smartm adapter for ioBroker
 
-This Adapter reads Data of ![Photovoltaik SLEnergy Plats](www.slenergy.com) out of their Cloud named ![SmartM](https://global.slenergytech.com/#/user/login).
+This Adapter reads Data of [Photovoltaik SLEnergy Plats](https://www.slenergy.com) out of their Cloud named [SmartM](https://global.slenergytech.com/#/user/login).
 
 ## Changelog
 
