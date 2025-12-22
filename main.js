@@ -115,7 +115,7 @@ class Smartm extends utils.Adapter {
 				this.setState("info.connection", false, true);
 				this.log.error(`Login failed: ${JSON.stringify(response.data, null, 2)}`);
 				//retry login in 1 minute
-				this.reLoginTimeout = setTimeout(() => {
+				this.reLoginTimeout = this.setTimeout(() => {
 					this.login();
 				}, 1000 * 60);
 			}
@@ -123,7 +123,7 @@ class Smartm extends utils.Adapter {
 			this.setState("info.connection", false, true);
 			this.log.error(`Error obtaining access token: ${error}`);
 			//retry login in 1 minute
-			this.reLoginTimeout = setTimeout(() => {
+			this.reLoginTimeout = this.setTimeout(() => {
 				this.login();
 			}, 1000 * 60);
 		}
@@ -221,7 +221,7 @@ class Smartm extends utils.Adapter {
 				} else {
 					this.log.error(`reading flow data failed: ${JSON.stringify(response.data, null, 2)}`);
 					//retry login in 1 minute
-					this.reLoginTimeout = setTimeout(() => {
+					this.reLoginTimeout = this.setTimeout(() => {
 						this.login();
 					}, 1000 * 60);
 					return;
@@ -229,7 +229,7 @@ class Smartm extends utils.Adapter {
 			} catch (error) {
 				this.log.error(`reading flow data failed: ${error}`);
 				//retry login in 1 minute
-				this.reLoginTimeout = setTimeout(() => {
+				this.reLoginTimeout = this.setTimeout(() => {
 					this.login();
 				}, 1000 * 60);
 				return;
@@ -272,7 +272,7 @@ class Smartm extends utils.Adapter {
 				} else {
 					this.log.error(`reading statistics failed: ${JSON.stringify(response.data, null, 2)}`);
 					//retry login in 1 minute
-					this.reLoginTimeout = setTimeout(() => {
+					this.reLoginTimeout = this.setTimeout(() => {
 						this.login();
 					}, 1000 * 60);
 					return;
@@ -280,7 +280,7 @@ class Smartm extends utils.Adapter {
 			} catch (error) {
 				this.log.error(`reading statistics data failed: ${error}`);
 				//retry login in 1 minute
-				this.reLoginTimeout = setTimeout(() => {
+				this.reLoginTimeout = this.setTimeout(() => {
 					this.login();
 				}, 1000 * 60);
 				return;
