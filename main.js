@@ -132,11 +132,11 @@ class Smartm extends utils.Adapter {
 	 * parse UserInfo from login response
 	 * @param {object} userInfo - user info object from login response
 	 */
-	parseUserInfo(userInfo) {
+	async parseUserInfo(userInfo) {
 		this.log.debug("Parsing user info");
 
 		//create subtree for userInfo
-		this.setObjectNotExists("userInfo", {
+		await this.setObjectNotExists("userInfo", {
 			type: "channel",
 			common: {
 				name: "Benutzerinformationen",
@@ -151,11 +151,11 @@ class Smartm extends utils.Adapter {
 	 * parse PowerStationList from login response
 	 * @param {array} powerStationList - array of power station objects from login response
 	 */
-	parsePowerStationList(powerStationList) {
+	async parsePowerStationList(powerStationList) {
 		this.log.debug("Parsing power station list");
 
 		//create subtree for powerStationList
-		this.setObjectNotExists("powerStationList", {
+		await this.setObjectNotExists("powerStationList", {
 			type: "channel",
 			common: {
 				name: "Anlageninformationen",
@@ -167,7 +167,7 @@ class Smartm extends utils.Adapter {
 		this.powerStationIds = [];
 		for (const powerStation of powerStationList) {
 			this.powerStationIds.push(powerStation.id);
-			this.setObjectNotExists(`powerStationList.${powerStation.id}`, {
+			await this.setObjectNotExists(`powerStationList.${powerStation.id}`, {
 				type: "channel",
 				common: {
 					name: powerStation.powerStationName,
@@ -208,7 +208,7 @@ class Smartm extends utils.Adapter {
 					this.log.debug(`flow data request successful${JSON.stringify(response.data, null, 2)}`);
 
 					const flowId = this.name2id(`powerStationList.${powerStationId}.flow`);
-					this.setObjectNotExists(flowId, {
+					await this.setObjectNotExists(flowId, {
 						type: "channel",
 						common: {
 							name: flowId,
@@ -259,7 +259,7 @@ class Smartm extends utils.Adapter {
 					this.log.debug(`statistic data request successful${JSON.stringify(response.data, null, 2)}`);
 
 					const powerstationStatisticsId = this.name2id(`powerStationList.${powerStationId}.statistics`);
-					this.setObjectNotExists(powerstationStatisticsId, {
+					await this.setObjectNotExists(powerstationStatisticsId, {
 						type: "channel",
 						common: {
 							name: powerstationStatisticsId,
@@ -287,7 +287,7 @@ class Smartm extends utils.Adapter {
 		}
 	}
 
-	parseData(parentIoBrokerId, jsonObject) {
+	async parseData(parentIoBrokerId, jsonObject) {
 		const objectKeys = Object.keys(jsonObject);
 		for (const key of objectKeys) {
 			const jsType = typeof jsonObject[key];
@@ -295,7 +295,7 @@ class Smartm extends utils.Adapter {
 
 			if (jsType === "object") {
 				if (jsonObject[key] !== null) {
-					this.setObjectNotExists(iobId, {
+					await this.setObjectNotExists(iobId, {
 						type: "channel",
 						common: {
 							name: iobId,
@@ -321,7 +321,7 @@ class Smartm extends utils.Adapter {
 						iobType = "string";
 				}
 
-				this.setObjectNotExists(iobId, {
+				await this.setObjectNotExists(iobId, {
 					type: "state",
 					common: {
 						name: iobId,
