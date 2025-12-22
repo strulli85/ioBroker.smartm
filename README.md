@@ -22,6 +22,8 @@ This Adapter reads Data of [Photovoltaik SLEnergy Plats](https://www.slenergy.co
 	### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
 - incorporated reviews
 
 ### 0.0.3 (2025-11-19)
