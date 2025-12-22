@@ -168,7 +168,7 @@ class Smartm extends utils.Adapter {
 		for (const powerStation of powerStationList) {
 			this.powerStationIds.push(powerStation.id);
 			await this.setObjectNotExists(`powerStationList.${powerStation.id}`, {
-				type: "channel",
+				type: "device",
 				common: {
 					name: powerStation.powerStationName,
 				},
@@ -306,32 +306,47 @@ class Smartm extends utils.Adapter {
 				}
 			} else {
 				//create state
-				let iobType;
 				switch (jsType) {
 					case "number":
-						iobType = "number";
-						break;
-					case "string":
-						iobType = "string";
+						await this.setObjectNotExists(iobId, {
+							type: "state",
+							common: {
+								name: iobId,
+								type: "number",
+								role: "value",
+								read: true,
+								write: false,
+							},
+							native: {},
+						});
 						break;
 					case "boolean":
-						iobType = "boolean";
+						await this.setObjectNotExists(iobId, {
+							type: "state",
+							common: {
+								name: iobId,
+								type: "boolean",
+								role: "indicator",
+								read: true,
+								write: false,
+							},
+							native: {},
+						});
 						break;
+					case "string":
 					default:
-						iobType = "string";
+						await this.setObjectNotExists(iobId, {
+							type: "state",
+							common: {
+								name: iobId,
+								type: "string",
+								role: "text",
+								read: true,
+								write: false,
+							},
+							native: {},
+						});
 				}
-
-				await this.setObjectNotExists(iobId, {
-					type: "state",
-					common: {
-						name: iobId,
-						type: iobType,
-						role: "state",
-						read: true,
-						write: false,
-					},
-					native: {},
-				});
 
 				this.setStateChanged(iobId, jsonObject[key], true);
 			}
