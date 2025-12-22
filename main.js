@@ -207,15 +207,16 @@ class Smartm extends utils.Adapter {
 				if (response.data.success) {
 					this.log.debug(`flow data request successful${JSON.stringify(response.data, null, 2)}`);
 
-					this.setObjectNotExists(`powerStationList.${powerStationId}.flow`, {
+					const flowId = this.name2id(`powerStationList.${powerStationId}.flow`);
+					this.setObjectNotExists(flowId, {
 						type: "channel",
 						common: {
-							name: `powerStationList.${powerStationId}.flow`,
+							name: flowId,
 						},
 						native: {},
 					});
 
-					this.parseData(`powerStationList.${powerStationId}.flow`, response.data.result);
+					this.parseData(flowId, response.data.result);
 				} else {
 					this.log.error(`reading flow data failed: ${JSON.stringify(response.data, null, 2)}`);
 					//retry login in 1 minute
@@ -257,15 +258,16 @@ class Smartm extends utils.Adapter {
 				if (response.data.success) {
 					this.log.debug(`statistic data request successful${JSON.stringify(response.data, null, 2)}`);
 
-					this.setObjectNotExists(`powerStationList.${powerStationId}.statistics`, {
+					const powerstationStatisticsId = this.name2id(`powerStationList.${powerStationId}.statistics`);
+					this.setObjectNotExists(powerstationStatisticsId, {
 						type: "channel",
 						common: {
-							name: `powerStationList.${powerStationId}.statistics`,
+							name: powerstationStatisticsId,
 						},
 						native: {},
 					});
 
-					this.parseData(`powerStationList.${powerStationId}.statistics`, response.data.result);
+					this.parseData(powerstationStatisticsId, response.data.result);
 				} else {
 					this.log.error(`reading statistics failed: ${JSON.stringify(response.data, null, 2)}`);
 					//retry login in 1 minute
@@ -289,7 +291,7 @@ class Smartm extends utils.Adapter {
 		const objectKeys = Object.keys(jsonObject);
 		for (const key of objectKeys) {
 			const jsType = typeof jsonObject[key];
-			const iobId = `${parentIoBrokerId}.${key}`;
+			const iobId = this.name2id(`${parentIoBrokerId}.${key}`);
 
 			if (jsType === "object") {
 				if (jsonObject[key] !== null) {
@@ -334,6 +336,10 @@ class Smartm extends utils.Adapter {
 				this.setStateChanged(iobId, jsonObject[key], true);
 			}
 		}
+	}
+
+	name2id(pName) {
+		return (pName || "").replace(this.FORBIDDEN_CHARS, "_");
 	}
 }
 
