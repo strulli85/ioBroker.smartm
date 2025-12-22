@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "smartm",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "news": {
+      "0.0.4": {
+        "en": "incorporated reviews",
+        "de": "in den warenkorb",
+        "ru": "включенные обзоры",
+        "pt": "revisões incorporadas",
+        "nl": "opgenomen onderzoeken",
+        "fr": "examens intégrés",
+        "it": "recensioni incorporate",
+        "es": "revisiones incorporadas",
+        "pl": "włączone przeglądy",
+        "uk": "відгуки",
+        "zh-cn": "综合审查"
+      },
       "0.0.3": {
         "en": "claried readme\nadded some sizes to controls in admin page",
         "de": "klares lesezeichen\neinige größen zu den kontrollen in admin-seite hinzugefügt",
