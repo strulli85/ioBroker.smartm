@@ -19,6 +19,7 @@ class Smartm extends utils.Adapter {
 			name: "smartm",
 		});
 
+		axios.defaults.timeout = 120000;
 		this.accessToken = null;
 		this.powerStationIds = [];
 
