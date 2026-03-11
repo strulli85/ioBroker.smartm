@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "smartm",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "news": {
+      "0.0.5": {
+        "en": "fixed some wrong versionnumbers detected by githab bot",
+        "de": "einige falsche versionsnummern von githab bot erkannt",
+        "ru": "исправлены некоторые неправильные номера версий, обнаруженные ботом githab",
+        "pt": "corrigir alguns números de versão errados detectados pelo bot githab",
+        "nl": "vast een aantal verkeerde versienummers gedetecteerd door githab bot",
+        "fr": "corrigé certains mauvais numéros de version détectés par le bot githab",
+        "it": "fissi alcuni numeri di versione errati rilevati da githab bot",
+        "es": "fija algunas versiones erróneas detectadas por githab bot",
+        "pl": "naprawił złe numery seryjne wykryte przez githab bot",
+        "uk": "виправлено деякі неправильні версії",
+        "zh-cn": "修正 githab bot 检测到的一些错误的版本编号"
+      },
       "0.0.4": {
         "en": "incorporated reviews",
         "de": "in den warenkorb",

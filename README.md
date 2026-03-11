@@ -21,8 +21,7 @@ This Adapter reads Data of [Photovoltaik SLEnergy Plats](https://www.slenergy.co
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 0.0.5 (2026-03-11)
 
 - fixed some wrong versionnumbers detected by githab bot
 
