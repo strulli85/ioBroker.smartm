@@ -43,7 +43,7 @@ This Adapter reads Data of [Photovoltaik SLEnergy Plats](https://www.slenergy.co
 
 MIT License
 
-Copyright (c) 2025 Christian Müller
+Copyright (c) 2026 Christian Müller
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
