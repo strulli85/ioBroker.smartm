@@ -38,6 +38,8 @@ This Adapter reads Data of [Photovoltaik SLEnergy Plats](https://www.slenergy.co
 
 - (Christian Müller) initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 
 MIT License
